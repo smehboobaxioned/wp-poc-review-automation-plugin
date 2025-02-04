@@ -163,3 +163,25 @@ axioned-automated-reviews/
 GPL v2 or later
 
 Developed by Axioned
+
+## Screenshots
+
+### Configuration Tab
+![Configuration Tab](screenshots/configuration.png)
+*Configure Google Places and Yelp API settings*
+
+### ACF Mapping Tab
+![ACF Mapping Tab](screenshots/acf-mapping.png)
+*Map your ACF fields to store review data*
+
+### Cron Status Tab
+![Cron Status](screenshots/cron-status.png)
+*Monitor and manually trigger review updates*
+
+### Debug Tab
+![Debug Tab](screenshots/debug.png)
+*Test API connections and view responses*
+
+### Logs Tab
+![Logs Tab](screenshots/logs.png)
+*View detailed plugin activity logs*
