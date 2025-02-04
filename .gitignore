@@ -1,0 +1,68 @@
+# WordPress core files
+wp-config.php
+wp-content/advanced-cache.php
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/mu-plugins/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+# Plugin specific
+debug.log
+/logs/*
+*.log
+
+# Development files
+node_modules/
+vendor/
+.sass-cache/
+*.css.map
+*.js.map
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build & Dist directories
+/dist/
+/build/
+/tmp/
+
+# Test coverage
+/coverage/
+/tests/coverage/
+
+# Composer
+composer.phar
+/vendor/
+
+# NPM/Yarn
+package-lock.json
+yarn.lock
+node_modules/
+
+# Local development
+local-config.php 
