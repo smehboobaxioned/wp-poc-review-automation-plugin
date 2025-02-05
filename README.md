@@ -56,6 +56,89 @@ This plugin fetches reviews from Google Places and Yelp APIs, storing them in Wo
    - Yelp Review Count (Text)
 3. Note the field names for mapping
 
+### 5. Notifications
+
+The plugin supports both email and Slack notifications for review updates, providing real-time monitoring of your review collection process.
+
+#### Email Notifications
+
+Email notifications keep you informed about review updates and any potential issues.
+
+##### Configuration
+- **Enable/Disable**: Toggle email notifications
+- **Recipients**: Multiple email addresses (comma-separated)
+- **From Name**: Custom sender name (defaults to site name)
+- **From Email**: Custom sender email (defaults to admin email)
+- **Frequency**: Choose notification frequency
+  - Immediately on update
+  - Daily Summary
+  - Weekly Summary
+
+##### Email Types
+1. **Success Notifications**
+   - Subject: "[Service] Reviews Update (Success) - [Date]"
+   - Contains:
+     - Update type (Manual/Cron/Debug)
+     - Service name (Google/Yelp)
+     - Timestamp
+     - Updated rating
+     - Updated review count
+
+2. **Failure Notifications**
+   - Subject: "[Service] Reviews Update (Failed) - [Date]"
+   - Contains:
+     - Update type (Manual/Cron/Debug)
+     - Service name (Google/Yelp)
+     - Timestamp
+     - Error details
+
+#### Slack Notifications
+
+Slack integration provides instant notifications in your team's Slack workspace.
+
+##### Configuration
+- **Enable/Disable**: Toggle Slack notifications
+- **Webhook URL**: Your Slack app's webhook URL
+- **Channel**: Optional custom channel name
+- **Test Connection**: Verify your Slack setup
+
+##### Notification Format
+```
+✅ *Google Reviews Update (Success) - 2024-02-05*
+----------------------------------------
+*Update Type:* MANUAL
+*Service:* Google
+*Time:* 2024-02-05 12:30:45
+
+*Updated Values:*
+Rating: *4.8/5*
+Review Count: *7,383+ reviews*
+----------------------------------------
+```
+
+##### Error Format
+```
+❌ *Yelp Reviews Update (Failed) - 2024-02-05*
+----------------------------------------
+*Update Type:* CRON
+*Service:* Yelp
+*Time:* 2024-02-05 12:30:45
+
+*Error Details:*
+API returned error: Invalid API key
+----------------------------------------
+```
+
+##### Notification Triggers
+
+Notifications are sent for:
+1. Manual updates via admin dashboard
+2. Scheduled cron updates
+3. Debug test runs
+4. Configuration errors
+5. API communication issues
+
+
 ## Technical Details
 
 ### Data Flow
@@ -186,117 +269,8 @@ Developed by Axioned
 ![Logs Tab](screenshots/logs.png)
 *View detailed plugin activity logs*
 
-## Notifications
 
-The plugin supports both email and Slack notifications for review updates, providing real-time monitoring of your review collection process.
+### Notifications Tab
+![Notifications Tab](screenshots/notifications.png)
+*Configure email and Slack notifications*
 
-### Email Notifications
-
-Email notifications keep you informed about review updates and any potential issues.
-
-#### Configuration
-- **Enable/Disable**: Toggle email notifications
-- **Recipients**: Multiple email addresses (comma-separated)
-- **From Name**: Custom sender name (defaults to site name)
-- **From Email**: Custom sender email (defaults to admin email)
-- **Frequency**: Choose notification frequency
-  - Immediately on update
-  - Daily Summary
-  - Weekly Summary
-
-#### Email Types
-1. **Success Notifications**
-   - Subject: "[Service] Reviews Update (Success) - [Date]"
-   - Contains:
-     - Update type (Manual/Cron/Debug)
-     - Service name (Google/Yelp)
-     - Timestamp
-     - Updated rating
-     - Updated review count
-
-2. **Failure Notifications**
-   - Subject: "[Service] Reviews Update (Failed) - [Date]"
-   - Contains:
-     - Update type (Manual/Cron/Debug)
-     - Service name (Google/Yelp)
-     - Timestamp
-     - Error details
-
-### Slack Notifications
-
-Slack integration provides instant notifications in your team's Slack workspace.
-
-#### Configuration
-- **Enable/Disable**: Toggle Slack notifications
-- **Webhook URL**: Your Slack app's webhook URL
-- **Channel**: Optional custom channel name
-- **Test Connection**: Verify your Slack setup
-
-#### Notification Format
-```
-✅ *Google Reviews Update (Success) - 2024-02-05*
-----------------------------------------
-*Update Type:* MANUAL
-*Service:* Google
-*Time:* 2024-02-05 12:30:45
-
-*Updated Values:*
-Rating: *4.8/5*
-Review Count: *7,383+ reviews*
-----------------------------------------
-```
-
-#### Error Format
-```
-❌ *Yelp Reviews Update (Failed) - 2024-02-05*
-----------------------------------------
-*Update Type:* CRON
-*Service:* Yelp
-*Time:* 2024-02-05 12:30:45
-
-*Error Details:*
-API returned error: Invalid API key
-----------------------------------------
-```
-
-### Notification Triggers
-
-Notifications are sent for:
-1. Manual updates via admin dashboard
-2. Scheduled cron updates
-3. Debug test runs
-4. Configuration errors
-5. API communication issues
-
-### Best Practices
-
-1. **Email Configuration**
-   - Use valid email addresses
-   - Configure SPF/DKIM for better deliverability
-   - Test notifications after setup
-
-2. **Slack Setup**
-   - Create a dedicated Slack app
-   - Use appropriate channel permissions
-   - Test webhook connection
-   - Keep webhook URL secure
-
-3. **Monitoring**
-   - Check notification logs
-   - Verify notification delivery
-   - Update recipient list as needed
-   - Monitor error patterns
-
-### Troubleshooting
-
-1. **Email Issues**
-   - Check spam folders
-   - Verify email configuration
-   - Confirm recipient addresses
-   - Check server email settings
-
-2. **Slack Issues**
-   - Verify webhook URL
-   - Check channel permissions
-   - Confirm Slack app status
-   - Review API response errors
