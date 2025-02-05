@@ -5,7 +5,7 @@
  * This file contains the code for fetching Yelp reviews.
  */
 
-function axioned_fetch_yelp_reviews() {
+function axioned_fetch_yelp_reviews($trigger = 'cron') {
     // Get settings from WordPress options
     $api_key = get_option('axioned_yelp_api_key');
     $business_name = get_option('axioned_yelp_business_name');
@@ -13,7 +13,15 @@ function axioned_fetch_yelp_reviews() {
     
     // Validate settings
     if (!$api_key || !$business_name || !$location) {
-        Axioned_Reviews_Logger::log('Yelp API configuration missing. Please check settings.', 'error');
+        $error_message = 'Yelp API configuration missing. Please check settings.';
+        Axioned_Reviews_Logger::log($error_message, 'error');
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            [],
+            false,
+            $trigger,
+            $error_message
+        );
         return false;
     }
     
@@ -41,7 +49,15 @@ function axioned_fetch_yelp_reviews() {
     
     // Check for cURL errors
     if (curl_errno($curl)) {
-        Axioned_Reviews_Logger::log('Yelp API cURL Error: ' . curl_error($curl), 'error');
+        $error_message = "cURL Error: " . curl_error($curl);
+        Axioned_Reviews_Logger::log($error_message, 'error');
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            [],
+            false,
+            $trigger,
+            $error_message
+        );
         curl_close($curl);
         return false;
     }
@@ -52,7 +68,15 @@ function axioned_fetch_yelp_reviews() {
     Axioned_Reviews_Logger::log("Yelp API Response Code: $http_code");
 
     if ($http_code !== 200) {
-        Axioned_Reviews_Logger::log("Yelp API returned HTTP code: $http_code", 'error');
+        $error_message = "Yelp API returned HTTP code: $http_code\nResponse: $response";
+        Axioned_Reviews_Logger::log($error_message, 'error');
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            [],
+            false,
+            $trigger,
+            $error_message
+        );
         curl_close($curl);
         return false;
     }
@@ -64,7 +88,15 @@ function axioned_fetch_yelp_reviews() {
 
     // Validate response data
     if (empty($data['businesses'])) {
-        error_log('No Yelp businesses found for the given name and location.');
+        $error_message = 'No Yelp businesses found for the given name and location.';
+        Axioned_Reviews_Logger::log($error_message, 'error');
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            [],
+            false,
+            $trigger,
+            $error_message
+        );
         return false;
     }
 
@@ -78,32 +110,44 @@ function axioned_fetch_yelp_reviews() {
     }
 
     if ($exact_match) {
-        Axioned_Reviews_Logger::log("Successfully fetched Yelp reviews. Rating: {$exact_match['rating']}, Count: {$exact_match['review_count']}");
-        
-        // Format the values
-        $formatted_rating = $exact_match['rating'] . '/5';
-        $formatted_count = number_format($exact_match['review_count']) . '+ reviews';
+        $formatted_data = [
+            'rating' => $exact_match['rating'] . '/5',
+            'count' => number_format($exact_match['review_count']) . '+ reviews'
+        ];
+
+        // Send success notification
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            $formatted_data,
+            true,
+            $trigger
+        );
         
         // Get field names
         $rating_field = get_option('axioned_yelp_rating_field');
         $count_field = get_option('axioned_yelp_count_field');
         
         if ($rating_field) {
-            update_option($rating_field, $formatted_rating);
-            Axioned_Reviews_Logger::log("Updated Yelp rating ACF field: {$rating_field} with value: {$formatted_rating}");
+            update_option($rating_field, $formatted_data['rating']);
+            Axioned_Reviews_Logger::log("Updated Yelp rating ACF field: {$rating_field} with value: {$formatted_data['rating']}");
         }
         
         if ($count_field) {
-            update_option($count_field, $formatted_count);
-            Axioned_Reviews_Logger::log("Updated Yelp count ACF field: {$count_field} with value: {$formatted_count}");
+            update_option($count_field, $formatted_data['count']);
+            Axioned_Reviews_Logger::log("Updated Yelp count ACF field: {$count_field} with value: {$formatted_data['count']}");
         }
         
-        return [
-            'rating' => $formatted_rating,
-            'count'  => $formatted_count
-        ];
+        return $formatted_data;
     } else {
-        Axioned_Reviews_Logger::log("No exact match found for business name: $business_name", 'error');
+        $error_message = "No exact match found for business name: $business_name";
+        Axioned_Reviews_Logger::log($error_message, 'error');
+        Axioned_Reviews_Notifications::send_review_update_email(
+            'yelp',
+            [],
+            false,
+            $trigger,
+            $error_message
+        );
         return false;
     }
 }

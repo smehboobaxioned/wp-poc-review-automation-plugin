@@ -147,10 +147,10 @@ function axioned_handle_test_api() {
     try {
         switch ($api) {
             case 'google':
-                $result = axioned_fetch_google_reviews();
+                $result = axioned_fetch_google_reviews('debug');
                 break;
             case 'yelp':
-                $result = axioned_fetch_yelp_reviews();
+                $result = axioned_fetch_yelp_reviews('debug');
                 break;
             default:
                 echo json_encode(array(

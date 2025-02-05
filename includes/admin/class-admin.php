@@ -38,6 +38,24 @@ function axioned_reviews_register_settings() {
     register_setting('axioned_reviews_cron_settings', 'axioned_reviews_time');
     register_setting('axioned_reviews_cron_settings', 'axioned_google_cron_enabled');
     register_setting('axioned_reviews_cron_settings', 'axioned_yelp_cron_enabled');
+
+    // Email Notification settings
+    register_setting('axioned_reviews_email_notifications', 'axioned_email_notifications_enabled');
+    register_setting('axioned_reviews_email_notifications', 'axioned_email_notification_frequency');
+    register_setting(
+        'axioned_reviews_email_notifications',
+        'axioned_notification_emails',
+        array(
+            'sanitize_callback' => 'axioned_validate_notification_emails'
+        )
+    );
+    register_setting('axioned_reviews_email_notifications', 'axioned_notification_from_name');
+    register_setting('axioned_reviews_email_notifications', 'axioned_notification_from_email');
+    
+    // Slack Notification settings
+    register_setting('axioned_reviews_slack_notifications', 'axioned_slack_notifications_enabled');
+    register_setting('axioned_reviews_slack_notifications', 'axioned_slack_webhook_url');
+    register_setting('axioned_reviews_slack_notifications', 'axioned_slack_channel');
 }
 add_action('admin_init', 'axioned_reviews_register_settings');
 
@@ -108,6 +126,10 @@ function axioned_reviews_settings_page() {
                class="nav-tab <?php echo $current_tab === 'logs' ? 'nav-tab-active' : ''; ?>">
                 Log
             </a>
+            <a href="?page=axioned-reviews-settings&tab=notifications" 
+               class="nav-tab <?php echo $current_tab === 'notifications' ? 'nav-tab-active' : ''; ?>">
+                Notifications
+            </a>
         </nav>
 
         <div class="tab-content">
@@ -127,6 +149,9 @@ function axioned_reviews_settings_page() {
                     break;
                 case 'logs':
                     axioned_reviews_logs_tab();
+                    break;
+                case 'notifications':
+                    axioned_reviews_notifications_tab();
                     break;
             }
             ?>
@@ -156,3 +181,39 @@ function axioned_display_admin_notices() {
     }
 }
 add_action('admin_notices', 'axioned_display_admin_notices');
+
+// Add this validation function
+function axioned_validate_notification_emails($input) {
+    if (empty($input)) {
+        return '';
+    }
+
+    $emails = array_map('trim', explode(',', $input));
+    $valid_emails = array();
+    $invalid_emails = array();
+
+    foreach ($emails as $email) {
+        if (empty($email)) {
+            continue;
+        }
+
+        if (is_email($email)) {
+            $valid_emails[] = sanitize_email($email);
+        } else {
+            $invalid_emails[] = $email;
+        }
+    }
+
+    if (!empty($invalid_emails)) {
+        add_settings_error(
+            'axioned_notification_emails',
+            'invalid_emails',
+            'Invalid email(s): ' . implode(', ', $invalid_emails),
+            'error'
+        );
+        // Return the old value
+        return get_option('axioned_notification_emails');
+    }
+
+    return implode(', ', $valid_emails);
+}

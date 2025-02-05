@@ -391,7 +391,7 @@ function axioned_handle_run_cron_now() {
         if ($service === 'google') {
             if (get_option('axioned_google_cron_enabled', '0') === '1') {
                 Axioned_Reviews_Logger::log("Manual execution of Google reviews update");
-                axioned_fetch_google_reviews();
+                axioned_fetch_google_reviews('manual');
                 update_option('axioned_google_last_run', current_time('mysql'));
                 axioned_set_admin_notice('Google reviews update completed successfully');
                 ob_end_clean();
@@ -404,7 +404,7 @@ function axioned_handle_run_cron_now() {
         } else {
             if (get_option('axioned_yelp_cron_enabled', '0') === '1') {
                 Axioned_Reviews_Logger::log("Manual execution of Yelp reviews update");
-                axioned_fetch_yelp_reviews();
+                axioned_fetch_yelp_reviews('manual');
                 update_option('axioned_yelp_last_run', current_time('mysql'));
                 axioned_set_admin_notice('Yelp reviews update completed successfully');
                 ob_end_clean();
