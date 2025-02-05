@@ -298,10 +298,12 @@ function axioned_reviews_notifications_tab() {
         });
 
         // Test Slack connection
-        $('.test-slack').click(function() {
+        $('.test-slack').click(function(e) {
+            e.preventDefault(); // Prevent any default action
+            
             const $button = $(this);
             const $result = $('#slack-test-result');
-            const webhook_url = $('input[name="axioned_slack_webhook_url"]').val();
+            const webhook_url = $('input[name="axioned_slack_webhook_url"]').val().trim();
             
             if (!webhook_url) {
                 $result.removeClass('success').addClass('error')
@@ -316,11 +318,12 @@ function axioned_reviews_notifications_tab() {
             $.ajax({
                 url: ajaxurl,
                 type: 'POST',
+                dataType: 'json', // Explicitly expect JSON response
                 data: {
                     action: 'axioned_test_slack',
                     nonce: '<?php echo wp_create_nonce("axioned_test_slack"); ?>',
                     webhook_url: webhook_url,
-                    channel: $('input[name="axioned_slack_channel"]').val()
+                    channel: $('input[name="axioned_slack_channel"]').val().trim()
                 },
                 success: function(response) {
                     if (response.success) {
@@ -334,9 +337,14 @@ function axioned_reviews_notifications_tab() {
                     }
                 },
                 error: function(xhr, status, error) {
-                    let errorMsg = error;
-                    if (xhr.responseJSON && xhr.responseJSON.data) {
-                        errorMsg = xhr.responseJSON.data;
+                    let errorMsg = 'Failed to send test message';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.data) {
+                            errorMsg = response.data;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing response:', e);
                     }
                     $result.removeClass('success').addClass('error')
                            .html('✗ Error: ' + errorMsg)
