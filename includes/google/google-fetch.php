@@ -22,6 +22,7 @@ function axioned_fetch_google_reviews($trigger = 'cron') {
             $trigger, 
             $error_message
         );
+        Axioned_Reviews_Notifications::send_slack_notification('google', [], false, $trigger, $error_message);
         return false;
     }
     
@@ -53,6 +54,7 @@ function axioned_fetch_google_reviews($trigger = 'cron') {
             $trigger, 
             $error_message
         );
+        Axioned_Reviews_Notifications::send_slack_notification('google', [], false, $trigger, $error_message);
         curl_close($curl);
         return false;
     }
@@ -71,6 +73,7 @@ function axioned_fetch_google_reviews($trigger = 'cron') {
             $trigger, 
             $error_message
         );
+        Axioned_Reviews_Notifications::send_slack_notification('google', [], false, $trigger, $error_message);
         curl_close($curl);
         return false;
     }
@@ -96,13 +99,14 @@ function axioned_fetch_google_reviews($trigger = 'cron') {
             'count' => number_format($data['userRatingCount']) . '+ reviews'
         ];
 
-        // Send success notification
+        // Send notifications
         Axioned_Reviews_Notifications::send_review_update_email(
             'google',
             $formatted_data,
             true,
             $trigger
         );
+        Axioned_Reviews_Notifications::send_slack_notification('google', $formatted_data, true, $trigger);
 
         // Get field names
         $rating_field = get_option('axioned_google_rating_field');

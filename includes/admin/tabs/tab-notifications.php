@@ -301,8 +301,17 @@ function axioned_reviews_notifications_tab() {
         $('.test-slack').click(function() {
             const $button = $(this);
             const $result = $('#slack-test-result');
+            const webhook_url = $('input[name="axioned_slack_webhook_url"]').val();
+            
+            if (!webhook_url) {
+                $result.removeClass('success').addClass('error')
+                       .html('✗ Webhook URL is required')
+                       .slideDown();
+                return;
+            }
             
             $button.prop('disabled', true).text('Sending...');
+            $result.hide();
             
             $.ajax({
                 url: ajaxurl,
@@ -310,13 +319,13 @@ function axioned_reviews_notifications_tab() {
                 data: {
                     action: 'axioned_test_slack',
                     nonce: '<?php echo wp_create_nonce("axioned_test_slack"); ?>',
-                    webhook_url: $('input[name="axioned_slack_webhook_url"]').val(),
+                    webhook_url: webhook_url,
                     channel: $('input[name="axioned_slack_channel"]').val()
                 },
                 success: function(response) {
                     if (response.success) {
                         $result.removeClass('error').addClass('success')
-                               .html('✓ Test message sent successfully!')
+                               .html('✓ ' + response.data)
                                .slideDown();
                     } else {
                         $result.removeClass('success').addClass('error')
@@ -324,9 +333,13 @@ function axioned_reviews_notifications_tab() {
                                .slideDown();
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    let errorMsg = error;
+                    if (xhr.responseJSON && xhr.responseJSON.data) {
+                        errorMsg = xhr.responseJSON.data;
+                    }
                     $result.removeClass('success').addClass('error')
-                           .html('✗ Failed to send test message')
+                           .html('✗ Error: ' + errorMsg)
                            .slideDown();
                 },
                 complete: function() {

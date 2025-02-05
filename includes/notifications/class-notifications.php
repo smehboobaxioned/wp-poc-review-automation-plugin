@@ -161,8 +161,22 @@ class Axioned_Reviews_Notifications {
         return $sent;
     }
     
-    public static function send_slack_notification($data) {
+    /**
+     * Send Slack notification for review updates
+     * 
+     * @param string $service 'google' or 'yelp'
+     * @param array $data Review data
+     * @param bool $success Whether the update was successful
+     * @param string $trigger 'manual', 'cron', or 'debug'
+     * @param string $error_message Error message if any
+     * @return bool Whether notification was sent successfully
+     */
+    public static function send_slack_notification($service, $data = [], $success = true, $trigger = 'cron', $error_message = '') {
+        // Log start of Slack notification process
+        Axioned_Reviews_Logger::log("Starting Slack notification process for {$service} reviews ({$trigger})");
+
         if (get_option('axioned_slack_notifications_enabled') !== '1') {
+            Axioned_Reviews_Logger::log('Slack notifications are disabled, skipping...', 'info');
             return false;
         }
 
@@ -170,54 +184,48 @@ class Axioned_Reviews_Notifications {
         $channel = get_option('axioned_slack_channel');
         
         if (empty($webhook_url)) {
+            Axioned_Reviews_Logger::log('Slack webhook URL not configured, skipping...', 'error');
             return false;
         }
 
-        $message = "*Review Updates - " . get_bloginfo('name') . "*\n\n";
+        $date = current_time('Y-m-d H:i:s');
+        $service_name = ucfirst($service);
+        $trigger_prefix = strtoupper($trigger);
+        $status = $success ? 'Success' : 'Failed';
+        $icon = $success ? '✅' : '❌';
+
+        // Build message
+        $message = sprintf(
+            "%s *%s Reviews Update (%s) - %s*\n",
+            $icon,
+            $service_name,
+            $status,
+            date('Y-m-d', strtotime($date))
+        );
         
-        if (isset($data['google'])) {
-            $message .= "*Google Reviews:*\n";
-            $message .= "Rating: " . $data['google']['rating'] . "\n";
-            $message .= "Reviews: " . $data['google']['count'] . "\n\n";
+        $message .= "----------------------------------------\n";
+        $message .= sprintf("*Update Type:* %s\n", $trigger_prefix);
+        $message .= sprintf("*Service:* %s\n", $service_name);
+        $message .= sprintf("*Time:* %s\n\n", $date);
+
+        if ($success) {
+            $message .= "*Updated Values:*\n";
+            $message .= sprintf("Rating: *%s*\n", $data['rating']);
+            $message .= sprintf("Review Count: *%s*\n", $data['count']);
+        } else {
+            $message .= "*Error Details:*\n";
+            $message .= $error_message . "\n";
         }
-        
-        if (isset($data['yelp'])) {
-            $message .= "*Yelp Reviews:*\n";
-            $message .= "Rating: " . $data['yelp']['rating'] . "\n";
-            $message .= "Reviews: " . $data['yelp']['count'] . "\n";
-        }
+
+        $message .= "----------------------------------------\n";
 
         $payload = array(
             'channel' => $channel,
             'text' => $message,
+            'mrkdwn' => true
         );
 
-        $args = array(
-            'body' => json_encode($payload),
-            'headers' => array('Content-Type' => 'application/json'),
-            'timeout' => 30,
-        );
-
-        $response = wp_remote_post($webhook_url, $args);
-        
-        return !is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200;
-    }
-
-    public static function test_slack_connection() {
-        $webhook_url = get_option('axioned_slack_webhook_url');
-        $channel = get_option('axioned_slack_channel');
-        
-        if (empty($webhook_url)) {
-            return new WP_Error('missing_webhook', 'Webhook URL is required');
-        }
-
-        $message = "*Test Message from " . get_bloginfo('name') . "*\n";
-        $message .= "Your Slack notifications are configured correctly! 🎉";
-
-        $payload = array(
-            'channel' => $channel,
-            'text' => $message,
-        );
+        Axioned_Reviews_Logger::log("Sending Slack message to channel: {$channel}");
 
         $args = array(
             'body' => json_encode($payload),
@@ -228,18 +236,83 @@ class Axioned_Reviews_Notifications {
         $response = wp_remote_post($webhook_url, $args);
         
         if (is_wp_error($response)) {
-            return $response;
+            Axioned_Reviews_Logger::log("Slack API Error: " . $response->get_error_message(), 'error');
+            return false;
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
         
         if ($response_code !== 200) {
-            return new WP_Error(
-                'slack_error',
-                'Slack returned error: ' . wp_remote_retrieve_response_message($response)
-            );
+            Axioned_Reviews_Logger::log("Slack API returned non-200 status code: {$response_code}", 'error');
+            return false;
         }
 
+        Axioned_Reviews_Logger::log("Slack notification sent successfully");
+        return true;
+    }
+
+    public static function test_slack_connection() {
+        Axioned_Reviews_Logger::log("Starting Slack test connection");
+
+        $webhook_url = get_option('axioned_slack_webhook_url');
+        $channel = get_option('axioned_slack_channel');
+        
+        if (empty($webhook_url)) {
+            Axioned_Reviews_Logger::log("Slack test failed: Webhook URL is empty", 'error');
+            return new WP_Error('missing_webhook', 'Webhook URL is required');
+        }
+
+        Axioned_Reviews_Logger::log("Testing Slack webhook: " . substr($webhook_url, 0, 30) . '...');
+
+        $message = "✅ *Test Message from " . get_bloginfo('name') . "*\n";
+        $message .= "----------------------------------------\n";
+        $message .= "Your Slack notifications are configured correctly! 🎉\n";
+        $message .= "• Webhook URL: Connected\n";
+        $message .= "• Channel: " . ($channel ? $channel : 'Default') . "\n";
+        $message .= "----------------------------------------\n";
+        $message .= "_Sent on: " . current_time('Y-m-d H:i:s') . "_";
+
+        $payload = array(
+            'channel' => $channel,
+            'text' => $message,
+            'mrkdwn' => true
+        );
+
+        $args = array(
+            'body' => json_encode($payload),
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            ),
+            'timeout' => 30,
+            'sslverify' => false // Try this if having SSL issues
+        );
+
+        Axioned_Reviews_Logger::log("Sending Slack test message...");
+
+        $response = wp_remote_post($webhook_url, $args);
+        
+        if (is_wp_error($response)) {
+            $error_message = $response->get_error_message();
+            Axioned_Reviews_Logger::log("Slack test failed: " . $error_message, 'error');
+            return new WP_Error('request_failed', $error_message);
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+        
+        Axioned_Reviews_Logger::log("Slack API Response Code: " . $response_code);
+        Axioned_Reviews_Logger::log("Slack API Response Body: " . $response_body);
+
+        if ($response_code !== 200) {
+            $error = "Slack API returned error code: " . $response_code;
+            if ($response_body) {
+                $error .= " - " . $response_body;
+            }
+            Axioned_Reviews_Logger::log($error, 'error');
+            return new WP_Error('api_error', $error);
+        }
+
+        Axioned_Reviews_Logger::log("Slack test message sent successfully");
         return true;
     }
 } 

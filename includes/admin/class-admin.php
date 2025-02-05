@@ -217,3 +217,36 @@ function axioned_validate_notification_emails($input) {
 
     return implode(', ', $valid_emails);
 }
+
+function axioned_handle_test_slack() {
+    // Clear any previous output
+    ob_clean();
+    
+    check_ajax_referer('axioned_test_slack', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized access');
+        return;
+    }
+
+    // Update settings first
+    if (isset($_POST['webhook_url'])) {
+        update_option('axioned_slack_webhook_url', sanitize_text_field($_POST['webhook_url']));
+    }
+    if (isset($_POST['channel'])) {
+        update_option('axioned_slack_channel', sanitize_text_field($_POST['channel']));
+    }
+
+    // Test the connection
+    $result = Axioned_Reviews_Notifications::test_slack_connection();
+
+    if (is_wp_error($result)) {
+        wp_send_json_error($result->get_error_message());
+    } else {
+        wp_send_json_success('Test message sent successfully');
+    }
+
+    // Ensure we exit after sending response
+    wp_die();
+}
+add_action('wp_ajax_axioned_test_slack', 'axioned_handle_test_slack');
