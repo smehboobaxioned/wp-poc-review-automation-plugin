@@ -122,6 +122,13 @@ function axioned_fetch_google_reviews($trigger = 'cron') {
             Axioned_Reviews_Logger::log("Updated Google count ACF field: {$count_field} with value: {$formatted_data['count']}");
         }
         
+        // Clear caches if configured
+        try {
+            Axioned_Reviews_Cache_Handler::clear_all_caches();
+        } catch (Exception $e) {
+            Axioned_Reviews_Logger::log('Cache clearing failed: ' . $e->getMessage(), 'error');
+        }
+
         return $formatted_data;
     } else {
         Axioned_Reviews_Logger::log('No Google business data found or missing fields.', 'error');

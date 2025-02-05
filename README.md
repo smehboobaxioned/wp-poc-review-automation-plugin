@@ -138,6 +138,29 @@ Notifications are sent for:
 4. Configuration errors
 5. API communication issues
 
+### Cache Management
+
+The plugin supports automatic cache clearing for various hosting providers and CDNs after review updates.
+
+#### Supported Providers
+- WP Engine
+- Cloudflare
+
+#### Configuration
+1. **WP Engine**
+   - Enable/disable automatic cache clearing
+   - No additional configuration needed
+
+2. **Cloudflare**
+   - Enable/disable automatic cache clearing
+   - Requires API Token
+   - Requires Zone ID
+
+#### Best Practices
+- Clear cache after review updates
+- Test cache clearing functionality
+- Monitor cache clearing logs
+- Keep API credentials secure
 
 ## Technical Details
 

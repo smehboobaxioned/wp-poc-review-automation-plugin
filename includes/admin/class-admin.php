@@ -56,6 +56,12 @@ function axioned_reviews_register_settings() {
     register_setting('axioned_reviews_slack_notifications', 'axioned_slack_notifications_enabled');
     register_setting('axioned_reviews_slack_notifications', 'axioned_slack_webhook_url');
     register_setting('axioned_reviews_slack_notifications', 'axioned_slack_channel');
+
+    // Cache settings
+    register_setting('axioned_reviews_cache_settings', 'axioned_clear_wpengine_cache');
+    register_setting('axioned_reviews_cache_settings', 'axioned_clear_cloudflare_cache');
+    register_setting('axioned_reviews_cache_settings', 'axioned_cloudflare_api_token');
+    register_setting('axioned_reviews_cache_settings', 'axioned_cloudflare_zone_id');
 }
 add_action('admin_init', 'axioned_reviews_register_settings');
 
@@ -130,6 +136,10 @@ function axioned_reviews_settings_page() {
                class="nav-tab <?php echo $current_tab === 'notifications' ? 'nav-tab-active' : ''; ?>">
                 Notifications
             </a>
+            <a href="?page=axioned-reviews-settings&tab=cache" 
+               class="nav-tab <?php echo $current_tab === 'cache' ? 'nav-tab-active' : ''; ?>">
+                Cache
+            </a>
         </nav>
 
         <div class="tab-content">
@@ -152,6 +162,9 @@ function axioned_reviews_settings_page() {
                     break;
                 case 'notifications':
                     axioned_reviews_notifications_tab();
+                    break;
+                case 'cache':
+                    axioned_reviews_cache_tab();
                     break;
             }
             ?>
@@ -250,3 +263,63 @@ function axioned_handle_test_slack() {
     wp_die();
 }
 add_action('wp_ajax_axioned_test_slack', 'axioned_handle_test_slack');
+
+// Add cache test AJAX handler
+function axioned_handle_test_cache_clear() {
+    // Clean any previous output
+    ob_clean();
+    
+    // Verify nonce and capabilities
+    check_ajax_referer('axioned_test_cache', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        Axioned_Reviews_Logger::log('Unauthorized cache clear attempt', 'warning');
+        wp_send_json_error(array(
+            'message' => 'Unauthorized access'
+        ));
+        return;
+    }
+
+    // Get and validate provider
+    $provider = isset($_POST['provider']) ? sanitize_text_field($_POST['provider']) : 'all';
+    $valid_providers = array('all', 'wpengine', 'cloudflare');
+    
+    if (!in_array($provider, $valid_providers)) {
+        Axioned_Reviews_Logger::log("Invalid cache provider requested: {$provider}", 'error');
+        wp_send_json_error(array(
+            'message' => 'Invalid cache provider'
+        ));
+        return;
+    }
+
+    // Attempt to clear cache
+    try {
+        Axioned_Reviews_Logger::log("Manual cache clear initiated for provider: {$provider}");
+        $result = Axioned_Reviews_Cache_Handler::clear_all_caches($provider);
+        
+        if (!empty($result['errors'])) {
+            wp_send_json_error(array(
+                'message' => 'Cache clearing failed: ' . implode(', ', $result['errors']),
+                'errors' => $result['errors']
+            ));
+        } else if (!empty($result['cleared'])) {
+            wp_send_json_success(array(
+                'message' => 'Successfully cleared cache for: ' . implode(', ', $result['cleared']),
+                'cleared' => $result['cleared']
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => 'No cache providers configured'
+            ));
+        }
+    } catch (Exception $e) {
+        Axioned_Reviews_Logger::log("Unexpected error during cache clear: " . $e->getMessage(), 'error');
+        wp_send_json_error(array(
+            'message' => 'Unexpected error occurred while clearing cache'
+        ));
+    }
+
+    // Ensure we exit after sending response
+    wp_die();
+}
+add_action('wp_ajax_axioned_test_cache_clear', 'axioned_handle_test_cache_clear');

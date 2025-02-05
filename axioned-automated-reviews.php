@@ -19,6 +19,7 @@ define('AXIONED_REVIEWS_PATH', plugin_dir_path(__FILE__));
 require_once AXIONED_REVIEWS_PATH . 'includes/class-logger.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/helpers.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/notifications/class-notifications.php';
+require_once AXIONED_REVIEWS_PATH . 'includes/class-cache-handler.php';
 
 // Include admin files
 require_once AXIONED_REVIEWS_PATH . 'includes/admin/class-admin.php';
@@ -32,6 +33,7 @@ require_once AXIONED_REVIEWS_PATH . 'includes/admin/tabs/tab-cron-status.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/admin/tabs/tab-debug.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/admin/tabs/tab-logs.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/admin/tabs/tab-notifications.php';
+require_once AXIONED_REVIEWS_PATH . 'includes/admin/tabs/tab-cache.php';
 
 // Include API files
 require_once AXIONED_REVIEWS_PATH . 'includes/yelp/yelp-fetch.php';

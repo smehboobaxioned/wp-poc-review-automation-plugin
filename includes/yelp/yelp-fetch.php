@@ -142,6 +142,13 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
             Axioned_Reviews_Logger::log("Updated Yelp count ACF field: {$count_field} with value: {$formatted_data['count']}");
         }
         
+        // Clear caches if configured
+        try {
+            Axioned_Reviews_Cache_Handler::clear_all_caches();
+        } catch (Exception $e) {
+            Axioned_Reviews_Logger::log('Cache clearing failed: ' . $e->getMessage(), 'error');
+        }
+        
         return $formatted_data;
     } else {
         $error_message = "No exact match found for business name: $business_name";
