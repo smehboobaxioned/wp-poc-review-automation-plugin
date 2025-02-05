@@ -72,7 +72,8 @@ class Axioned_Reviews_Cache_Handler {
      * Clear WP Engine cache
      */
     private static function clear_wpengine_cache() {
-        if (!function_exists('WpeCommon')) {
+        // Check if WpeCommon class exists and has purge_varnish_cache method
+        if (!class_exists('WpeCommon') || !method_exists( 'WpeCommon', 'purge_varnish_cache' )) {
             Axioned_Reviews_Logger::log("WP Engine functions not available - this might not be a WP Engine site", 'error');
             throw new Exception('WP Engine functions not available');
         }
