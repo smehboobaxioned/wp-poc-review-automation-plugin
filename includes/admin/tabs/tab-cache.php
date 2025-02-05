@@ -20,8 +20,9 @@ function axioned_reviews_cache_tab() {
                 <!-- WP Engine Section -->
                 <div class="provider-card">
                     <div class="provider-header">
-                        <svg width="32" height="32" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#40BAC8" d="M250 0C111.929 0 0 111.929 0 250s111.929 250 250 250 250-111.929 250-250S388.071 0 250 0zm146.825 321.432c-4.076 7.857-10.764 15.715-17.452 21.236-6.688 5.522-13.376 9.599-21.233 13.376-7.857 3.778-15.715 6.687-23.572 8.927-7.857 2.24-15.715 3.778-23.572 4.374-7.857.597-15.118.895-21.806.895-17.452 0-34.307-2.239-50.467-6.687-16.159-4.449-30.856-10.764-44.232-19.094-13.377-8.33-25.214-18.347-35.799-30.26-10.585-11.912-19.591-25.214-26.875-40.156-7.284-14.941-12.807-31.204-16.584-48.656-3.777-17.452-5.719-36.097-5.719-56.186 0-19.591 1.942-37.94 5.719-54.99 3.777-17.049 9.3-32.767 16.584-47.112 7.284-14.346 16.29-27.124 26.875-38.438 10.585-11.315 22.422-20.935 35.799-28.792 13.376-7.857 28.073-13.973 44.232-18.347 16.16-4.374 33.015-6.538 50.467-6.538 7.284 0 14.942.298 23.274.895 8.33.596 16.585 1.643 25.214 3.181 8.628 1.538 17.049 3.777 25.214 6.687 8.33 2.911 16.16 6.39 23.572 10.466l-24.765 47.112c-11.912-7.284-24.467-12.48-37.343-15.715-12.877-3.181-25.812-4.822-38.736-4.822-11.316 0-22.124 1.344-32.365 4.076-10.242 2.687-19.293 6.687-27.472 11.912-8.18 5.224-15.416 11.613-21.806 19.093-6.389 7.48-11.912 15.864-16.584 25.214-4.672 9.3-8.18 19.591-10.764 30.856-2.538 11.316-3.777 23.274-3.777 36.097 0 13.377 1.24 25.812 3.777 37.343 2.583 11.464 6.092 21.755 10.764 30.856 4.672 9.102 10.195 17.452 16.584 24.765 6.39 7.36 13.675 13.526 21.806 18.497 8.18 4.971 17.23 8.777 27.472 11.315 10.241 2.583 21.05 3.777 32.365 3.777 13.526 0 26.577-1.643 39.334-4.971 12.757-3.33 25.513-8.33 38.14-15.118l24.765 47.112z"/>
+                        <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                            <circle cx="512" cy="512" r="512" style="fill:#0ecad4"/>
+                            <path d="M443.4 723.7h135.9v-103l-32.9-32.9h-70.1l-32.9 32.9v103zm175.9-278.9-32.9 32.9v71.5l32.9 32.9h103V446.2h-103v-1.4zm-40.1-144.5H443.4v103l32.9 32.9h70.1l32.9-32.9v-103zm144.5 423.4v-103l-32.9-32.9h-103v135.9h135.9zM333.2 300.3l-32.9 32.9v103h135.9V300.3h-103zm254.6 0v103l32.9 32.9h103V300.3H587.8zM512 532c-10 0-18.6-8.6-18.6-18.6s8.6-18.6 18.6-18.6c10 0 18.6 8.6 18.6 18.6S522 532 512 532zm-75.8-87.2H300.3v135.9h103l32.9-32.9v-103zm0 175.9-32.9-32.9h-103v135.9h103l32.9-32.9v-70.1z" style="fill:#fff"/>
                         </svg>
                         <h3>WP Engine Cache</h3>
                     </div>
@@ -33,7 +34,7 @@ function axioned_reviews_cache_tab() {
                                    <?php checked(get_option('axioned_clear_wpengine_cache'), '1'); ?>>
                             <span class="slider round"></span>
                         </label>
-                        <p class="description">Clear WP Engine cache after review updates</p>
+                        <p class="description radio-description">Clear WP Engine cache after review updates</p>
                         
                         <?php if (get_option('axioned_clear_wpengine_cache') === '1'): ?>
                             <button type="button" class="button test-cache" data-provider="wpengine">
@@ -47,8 +48,10 @@ function axioned_reviews_cache_tab() {
                 <!-- Cloudflare Section -->
                 <div class="provider-card">
                     <div class="provider-header">
-                        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#F6821F" d="M8.16 23.96c.171.34.037.756-.303.927l-1.725.869c-.34.171-.756.037-.927-.303C3.767 22.829 3 19.999 3 17c0-7.18 5.82-13 13-13 5.595 0 10.366 3.534 12.207 8.49.134.363-.052.766-.415.9l-1.85.677c-.363.133-.766-.052-.9-.415C23.635 9.669 20.047 7 16 7c-5.523 0-10 4.477-10 10 0 2.252.744 4.33 2.001 6.003.171.34.037.756-.303.927zM23.84 8.04c-.171-.34-.037-.756.303-.927l1.725-.869c.34-.171.756-.037.927.303C28.233 9.171 29 12.001 29 15c0 7.18-5.82 13-13 13-5.595 0-10.366-3.534-12.207-8.49-.134-.363.052-.766.415-.9l1.85-.677c.363-.133.766.052.9.415C8.365 22.331 11.953 25 16 25c5.523 0 10-4.477 10-10 0-2.252-.744-4.33-2.001-6.003-.171-.34-.037-.756.303-.927z"/>
+                        <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg" aria-label="Cloudflare" role="img" viewBox="0 0 512 512">
+                            <rect width="512" height="512" rx="15%" fill="#ffffff"/>
+                            <path fill="#f38020" d="M331 326c11-26-4-38-19-38l-148-2c-4 0-4-6 1-7l150-2c17-1 37-15 43-33 0 0 10-21 9-24a97 97 0 0 0-187-11c-38-25-78 9-69 46-48 3-65 46-60 72 0 1 1 2 3 2h274c1 0 3-1 3-3z"/>
+                            <path fill="#faae40" d="M381 224c-4 0-6-1-7 1l-5 21c-5 16 3 30 20 31l32 2c4 0 4 6-1 7l-33 1c-36 4-46 39-46 39 0 2 0 3 2 3h113l3-2a81 81 0 0 0-78-103"/>
                         </svg>
                         <h3>Cloudflare Cache</h3>
                     </div>
@@ -76,7 +79,7 @@ function axioned_reviews_cache_tab() {
                                    <?php checked(get_option('axioned_clear_cloudflare_cache'), '1'); ?>>
                             <span class="slider round"></span>
                         </label>
-                        <p class="description">Clear Cloudflare cache after review updates</p>
+                        <p class="description radio-description">Clear Cloudflare cache after review updates</p>
 
                         <div id="cloudflare-settings" style="display: <?php echo get_option('axioned_clear_cloudflare_cache') === '1' ? 'block' : 'none'; ?>">
                             <table class="form-table">
@@ -187,6 +190,10 @@ function axioned_reviews_cache_tab() {
     .cache-test-result.error {
         background: #fcf0f1;
         border: 1px solid #d63638;
+    }
+    p.description.radio-description {
+        display: inline-block;
+        vertical-align: middle;
     }
     </style>
 
