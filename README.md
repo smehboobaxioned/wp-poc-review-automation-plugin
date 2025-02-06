@@ -1,19 +1,46 @@
 # Axioned Automated Reviews
 
-Automatically fetch and display Google Places and Yelp reviews in WordPress using ACF.
+A WordPress plugin that fetches reviews from Google Places and Yelp APIs, storing them in WordPress options. It uses ACF for field mapping and WordPress cron for automated updates.
 
-## Overview
+## Changelog
 
-This plugin fetches reviews from Google Places and Yelp APIs, storing them in WordPress options. It uses ACF for field mapping and WordPress cron for automated updates.
+### 1.x.x
+- Added Yelp scraping fallback mechanism
+- Improved error handling
+- Added debug tools for testing scraping
 
-## Technical Requirements
+## Requirements
 
 - WordPress 5.0+
 - PHP 7.4+
 - Advanced Custom Fields (ACF) Pro
 - Google Places API key
 - Yelp API key
-- SSL certificate (for API security)
+- cURL enabled
+
+## Features
+
+- Automated review fetching from Google Places API and Yelp API
+- Fallback mechanism for Yelp reviews when API fails
+- Custom scheduling for review updates
+- Email and Slack notifications
+- Debug tools and logging
+- ACF field integration
+
+## Yelp Reviews Integration
+
+### Primary Method: Yelp API
+- Uses Yelp Fusion API to fetch business ratings and review counts
+- Requires valid API key and business details
+- Automatically updates at scheduled intervals
+
+### Fallback Method: Web Scraping
+- Automatically activates when Yelp API fails
+- Scrapes business page to extract:
+  - Overall rating
+  - Total review count
+- No additional configuration needed
+- Uses same format as API response
 
 ## Installation & Setup
 
