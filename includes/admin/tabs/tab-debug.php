@@ -104,13 +104,19 @@ function axioned_reviews_debug_tab() {
                     </h4>
                     <div class="collapsible-content">
                         <div class="debug-info">
+                            <div class="api-note">
+                                <p><strong>Note:</strong> If the Yelp API fails to fetch reviews, the system will automatically fall back to scraping the Yelp business page to extract ratings and review counts.</p>
+                            </div>
                             <p><strong>API Key:</strong> <span class="masked-key"><?php echo esc_html(substr(get_option('axioned_yelp_api_key', ''), 0, 6) . '...'); ?></span></p>
                             <p><strong>Business Name:</strong> <?php echo esc_html(get_option('axioned_yelp_business_name', '')); ?></p>
                             <p><strong>Location:</strong> <?php echo esc_html(get_option('axioned_yelp_location', '')); ?></p>
                         </div>
-                        <button class="button test-api" data-api="yelp">Test Yelp API Connection</button>
+                        <div class="api-test-buttons">
+                            <button class="button test-api" data-api="yelp">Test Yelp API Connection</button>
+                            <button class="button test-scrape" data-service="yelp">Test Yelp Scraping Fallback</button>
+                        </div>
                         <div class="debug-progress" id="yelp-progress" style="display: none;">
-                            <span class="spinner is-active"></span> Testing API connection...
+                            <span class="spinner is-active"></span> Testing connection...
                         </div>
                         <div class="debug-results" id="yelp-results"></div>
                     </div>

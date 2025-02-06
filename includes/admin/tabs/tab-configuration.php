@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Yelp Section -->
+        <!-- Yelp Configuration Section -->
         <div class="config-section yelp-section">
             <div class="section-header">
                 <div class="service-icon">
@@ -90,6 +90,9 @@
                 <h3>Yelp Reviews Configuration</h3>
             </div>
             <div class="section-content">
+                <div class="api-note">
+                    <p><strong>Note:</strong> If the Yelp API fails to fetch reviews, the system will automatically fall back to scraping the Yelp business page to extract ratings and review counts.</p>
+                </div>
                 <form method="post" action="options.php" class="yelp-settings-form">
                     <?php settings_fields('axioned_reviews_settings'); ?>
                     <!-- Preserve Google settings -->

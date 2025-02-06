@@ -381,7 +381,8 @@ function axioned_reviews_admin_styles() {
             }
 
             /* Enhanced Button Styles */
-            .button.test-api {
+            .button.test-api,
+            .button.test-scrape {
                 background: #2271b1;
                 border: 1px solid #2271b1;
                 color: #fff;
@@ -705,6 +706,26 @@ function axioned_reviews_admin_styles() {
 
             .config-section:first-child {
                 margin-top: 20px;
+            }
+
+            /* API Note Styles */
+            .api-note {
+                background: #f0f6fc;
+                border-left: 4px solid #2271b1;
+                padding: 12px 16px;
+                margin-bottom: 20px;
+                border-radius: 2px;
+            }
+
+            .api-note p {
+                margin: 0;
+                color: #1d2327;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .api-note strong {
+                color: #1d2327;
             }
         </style>
         <?php

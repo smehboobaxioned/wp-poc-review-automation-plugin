@@ -20,6 +20,7 @@ require_once AXIONED_REVIEWS_PATH . 'includes/class-logger.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/helpers.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/notifications/class-notifications.php';
 require_once AXIONED_REVIEWS_PATH . 'includes/class-cache-handler.php';
+require_once AXIONED_REVIEWS_PATH . 'includes/yelp/yelp-scraper.php';
 
 // Include admin files
 require_once AXIONED_REVIEWS_PATH . 'includes/admin/class-admin.php';

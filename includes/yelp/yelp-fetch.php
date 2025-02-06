@@ -13,7 +13,13 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
     
     // Validate settings
     if (!$api_key || !$business_name || !$location) {
-        $error_message = 'Yelp API configuration missing. Please check settings.';
+        Axioned_Reviews_Logger::log('API configuration missing, trying scraper fallback');
+        $scraper_result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        if ($scraper_result) {
+            return $scraper_result;
+        }
+        // If scraper also fails, continue with original error handling
+        $error_message = 'Yelp API configuration missing and scraping failed. Please check settings.';
         Axioned_Reviews_Logger::log($error_message, 'error');
         Axioned_Reviews_Notifications::send_review_update_email(
             'yelp',
@@ -50,6 +56,12 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
     
     // Check for cURL errors
     if (curl_errno($curl)) {
+        Axioned_Reviews_Logger::log('cURL error, trying scraper fallback');
+        $scraper_result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        if ($scraper_result) {
+            return $scraper_result;
+        }
+        // If scraper fails, continue with original error handling
         $error_message = "cURL Error: " . curl_error($curl);
         Axioned_Reviews_Logger::log($error_message, 'error');
         Axioned_Reviews_Notifications::send_review_update_email(
@@ -70,6 +82,12 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
     Axioned_Reviews_Logger::log("Yelp API Response Code: $http_code");
 
     if ($http_code !== 200) {
+        Axioned_Reviews_Logger::log('API returned non-200 status, trying scraper fallback');
+        $scraper_result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        if ($scraper_result) {
+            return $scraper_result;
+        }
+        // If scraper fails, continue with original error handling
         $error_message = "Yelp API returned HTTP code: $http_code\nResponse: $response";
         Axioned_Reviews_Logger::log($error_message, 'error');
         Axioned_Reviews_Notifications::send_review_update_email(
@@ -91,6 +109,12 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
 
     // Validate response data
     if (empty($data['businesses'])) {
+        Axioned_Reviews_Logger::log('No businesses found in API response, trying scraper fallback');
+        $scraper_result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        if ($scraper_result) {
+            return $scraper_result;
+        }
+        // If scraper fails, continue with original error handling
         $error_message = 'No Yelp businesses found for the given name and location.';
         Axioned_Reviews_Logger::log($error_message, 'error');
         Axioned_Reviews_Notifications::send_review_update_email(
@@ -151,6 +175,12 @@ function axioned_fetch_yelp_reviews($trigger = 'cron') {
         
         return $formatted_data;
     } else {
+        Axioned_Reviews_Logger::log('No exact business match found in API response, trying scraper fallback');
+        $scraper_result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        if ($scraper_result) {
+            return $scraper_result;
+        }
+        // If scraper fails, continue with original error handling
         $error_message = "No exact match found for business name: $business_name";
         Axioned_Reviews_Logger::log($error_message, 'error');
         Axioned_Reviews_Notifications::send_review_update_email(

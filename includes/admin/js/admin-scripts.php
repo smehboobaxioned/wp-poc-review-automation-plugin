@@ -105,6 +105,77 @@ function axioned_reviews_admin_scripts() {
                     });
                 }
 
+                // Add to existing jQuery document ready function in tab-debug.php
+                // Test scraping functionality
+                $('.test-scrape').click(function() {
+                    const $button = $(this);
+                    const $progress = $('#yelp-progress');
+                    const $results = $('#yelp-results');
+                    const service = $button.data('service');
+                    
+                    // Reset and show progress
+                    $results.removeClass('show').fadeOut(300, function() {
+                        $(this).removeClass('success error').empty();
+                        $progress.fadeIn(300);
+                        $button.prop('disabled', true);
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'axioned_test_scrape',
+                                service: service,
+                                nonce: '<?php echo wp_create_nonce("axioned_test_api"); ?>'
+                            },
+                            success: function(response) {
+                                $progress.fadeOut(300, function() {
+                                    if (response.success) {
+                                        var html = '<div class="success">';
+                                        html += '<h4>Scraping Results:</h4>';
+                                        html += '<p><strong>Rating:</strong> ' + response.data.rating + '</p>';
+                                        html += '<p><strong>Review Count:</strong> ' + response.data.count + '</p>';
+                                        html += '<p class="scrape-note">Note: Data retrieved via web scraping (fallback method)</p>';
+                                        html += '</div>';
+                                        $results.html(html).fadeIn(300).addClass('show');
+                                    } else {
+                                        const errorMsg = response.data && response.data.message 
+                                            ? response.data.message 
+                                            : 'Failed to scrape data';
+                                        var html = '<div class="error">';
+                                        html += '<h4>Error:</h4>';
+                                        html += '<p>' + errorMsg + '</p>';
+                                        html += '</div>';
+                                        $results.html(html).fadeIn(300).addClass('show');
+                                    }
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                $progress.fadeOut(300, function() {
+                                    let errorMsg = 'Failed to scrape data';
+                                    try {
+                                        const response = JSON.parse(xhr.responseText);
+                                        if (response.data && response.data.message) {
+                                            errorMsg = response.data.message;
+                                        }
+                                    } catch (e) {
+                                        errorMsg += ': ' + error;
+                                    }
+                                    var html = '<div class="error">';
+                                    html += '<h4>Error:</h4>';
+                                    html += '<p>' + errorMsg + '</p>';
+                                    html += '</div>';
+                                    $results.html(html).fadeIn(300).addClass('show');
+                                });
+                            },
+                            complete: function() {
+                                $button.prop('disabled', false);
+                            }
+                        });
+                    });
+                });
+                
+
 
                 /* CRON JOB TAB JS */
                 // Update current UTC time

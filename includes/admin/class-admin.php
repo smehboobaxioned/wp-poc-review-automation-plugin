@@ -323,3 +323,73 @@ function axioned_handle_test_cache_clear() {
     wp_die();
 }
 add_action('wp_ajax_axioned_test_cache_clear', 'axioned_handle_test_cache_clear');
+
+// Add this new AJAX handler
+function axioned_handle_test_scrape() {
+    // Clean any previous output
+    ob_clean();
+    
+    // Set JSON headers
+    header('Content-Type: application/json');
+    header('Cache-Control: no-cache');
+    
+    check_ajax_referer('axioned_test_api', 'nonce');
+    
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array(
+            'message' => 'Unauthorized access'
+        ));
+        return;
+    }
+
+    $service = isset($_POST['service']) ? sanitize_text_field($_POST['service']) : '';
+    
+    if ($service !== 'yelp') {
+        wp_send_json_error(array(
+            'message' => 'Invalid service specified'
+        ));
+        return;
+    }
+
+    try {
+        require_once plugin_dir_path(__FILE__) . '../yelp/yelp-scraper.php';
+        
+        $business_name = get_option('axioned_yelp_business_name');
+        $location = get_option('axioned_yelp_location');
+        
+        if (!$business_name || !$location) {
+            wp_send_json_error(array(
+                'message' => 'Business name and location are required'
+            ));
+            return;
+        }
+
+        $result = Axioned_Yelp_Scraper::scrape_reviews($business_name, $location);
+        
+        if ($result) {
+            // Clean output buffer before sending response
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            
+            wp_send_json_success(array(
+                'rating' => $result['rating'],
+                'count' => $result['count']
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => 'Failed to scrape Yelp reviews'
+            ));
+        }
+
+    } catch (Exception $e) {
+        Axioned_Reviews_Logger::log('Scraping error: ' . $e->getMessage(), 'error');
+        wp_send_json_error(array(
+            'message' => $e->getMessage()
+        ));
+    }
+
+    // Ensure we exit after sending response
+    wp_die();
+}
+add_action('wp_ajax_axioned_test_scrape', 'axioned_handle_test_scrape');
