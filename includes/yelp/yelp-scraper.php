@@ -244,7 +244,7 @@ class Axioned_Yelp_Scraper {
             if ($rating !== null && $count !== null) {
                 $result = [
                     'rating' => number_format($rating, 1) . '/5',
-                    'count' => $count . '+ reviews'
+                    'count' => number_format($count) . '+ reviews'
                 ];
                 Axioned_Reviews_Logger::log("Successfully scraped Yelp reviews: " . print_r($result, true));
                 return $result;
