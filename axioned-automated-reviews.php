@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Axioned Automated Reviews
  * Description: Fetches Yelp and Google reviews automatically and stores them in WP options.
- * Version: 1.0
+ * Version: 1.1.0
  * Author: Axioned
  * Text Domain: axioned-automated-reviews
  */
